@@ -138,6 +138,19 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Estilos para búsqueda y botones de acción */
+        .search-container { margin-bottom: 20px; display: flex; gap: 10px; }
+        .search-container input { flex-grow: 1; }
+
+        .btn-action {
+            padding: 8px 12px; border: none; border-radius: 10px; cursor: pointer; margin-right: 5px; font-size: 0.9rem;
+        }
+        .btn-edit { background: var(--lilac); color: white; }
+        .btn-delete { background: #FF6B6B; color: white; }
+        .btn-action:hover { opacity: 0.8; }
+
+        /* Ocultar input oculto */
+        .hidden { display: none; }
       
     </style>
 </head>
@@ -193,15 +206,19 @@
 
         <!-- SECCIÓN CLIENTES -->
         <div id="tab-clientes" class="tab-content" style="display:none">
+            <div class="search-container">
             <button class="btn btn-primary" onclick="openModal('clientModal')">+ Nuevo Cliente</button>
-            <table id="clientsTable" style="margin-top:20px">
-                <thead>
-                    <tr><th>Nombre</th><th>Teléfono</th><th>Dirección</th></tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <input type="text" id="searchClient" class="input-cute" placeholder=" Buscar por nombre o teléfono..." onkeyup="filterClients()">
         </div>
-
+    
+        <table id="clientsTable" style="margin-top:20px">
+            <thead>
+                <tr><th>Nombre</th><th>Teléfono</th><th>Dirección</th><th>Acciones</th></tr>
+            </thead>
+        <tbody></tbody>
+        </table>
+        </div>
+        
         <!-- SECCIÓN INVENTARIO -->
         <div id="tab-inventario" class="tab-content" style="display:none">
             <h3>Stock Actual</h3>
@@ -234,15 +251,16 @@
 
     <!-- MODAL CLIENTE -->
     <div id="clientModal" class="modal">
-        <div class="modal-content">
-            <h2>Nuevo Cliente ✨</h2>
-            <input type="text" id="cName" class="input-cute" placeholder="Nombre">
-            <input type="text" id="cPhone" class="input-cute" placeholder="Teléfono">
-            <input type="text" id="cAddr" class="input-cute" placeholder="Dirección">
-            <button class="btn btn-primary" onclick="saveClient()">Guardar</button>
-            <button class="btn" style="background:#eee" onclick="closeModal('clientModal')">Cerrar</button>
-        </div>
+    <div class="modal-content">
+        <h2 id="modalTitle">Nuevo Cliente ✨</h2>
+        <input type="hidden" id="cId"> <!-- Campo oculto para el ID -->
+        <input type="text" id="cName" class="input-cute" placeholder="Nombre">
+        <input type="text" id="cPhone" class="input-cute" placeholder="Teléfono">
+        <input type="text" id="cAddr" class="input-cute" placeholder="Dirección">
+        <button class="btn btn-primary" onclick="saveClient()">Guardar</button>
+        <button class="btn" style="background:#eee" onclick="closeModal('clientModal')">Cerrar</button>
     </div>
+</div>
 
     <script>
         // CONFIGURACIÓN
@@ -312,16 +330,20 @@
             `).join('');
         }
 
-        function renderClients() {
-            const tbody = document.querySelector('#clientsTable tbody');
-            tbody.innerHTML = clients.map(c => `
-                <tr>
-                    <td>${c.Nombre}</td>
-                    <td>${c.Telefono}</td>
-                    <td>${c.Direccion}</td>
-                </tr>
-            `).join('');
-        }
+       function renderClients(dataToRender = clients) {
+    const tbody = document.querySelector('#clientsTable tbody');
+    tbody.innerHTML = dataToRender.map(c => `
+        <tr>
+            <td>${c.Nombre}</td>
+            <td>${c.Telefono}</td>
+            <td>${c.Direccion}</td>
+            <td>
+                <button class="btn-action btn-edit" onclick="editClient(${c.ID})"><i class="fas fa-edit"></i></button>
+                <button class="btn-action btn-delete" onclick="deleteClient(${c.ID})"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>
+    `).join('');
+}
 
         function renderInventory() {
             const tbody = document.querySelector('#inventoryTable tbody');
@@ -422,6 +444,97 @@
         function openModal(id) { document.getElementById(id).style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
+        // Función para buscar clientes
+function filterClients() {
+    const term = document.getElementById('searchClient').value.toLowerCase();
+    const filtered = clients.filter(c => 
+        c.Nombre.toLowerCase().includes(term) || 
+        c.Telefono.toString().includes(term)
+    );
+    renderClients(filtered);
+}
+
+// Función para cargar datos en el modal y editar
+function editClient(id) {
+    const client = clients.find(c => c.ID == id);
+    if (client) {
+        document.getElementById('modalTitle').innerText = 'Editar Cliente ✏️';
+        document.getElementById('cId').value = client.ID;
+        document.getElementById('cName').value = client.Nombre;
+        document.getElementById('cPhone').value = client.Telefono;
+        document.getElementById('cAddr').value = client.Direccion;
+        document.getElementById('clientModal').style.display = 'flex';
+    }
+}
+
+// Función para eliminar cliente
+async function deleteClient(id) {
+    if(confirm('¿Seguro que deseas eliminar este cliente? Esta acción no se puede deshacer.')) {
+        try {
+            await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ tipo: 'Clientes', accion: 'eliminar', datos: id })
+            });
+            alert('Cliente eliminado 🗑️');
+            loadData(); // Recargar la lista
+        } catch (e) {
+            alert('Error al eliminar');
+        }
+    }
+}
+
+// Modifica tu función saveClient existente por esta (ahora detecta si es editar o crear):
+async function saveClient() {
+    const id = document.getElementById('cId').value;
+    const name = document.getElementById('cName').value;
+    const phone = document.getElementById('cPhone').value;
+    const addr = document.getElementById('cAddr').value;
+    
+    if(!name || !phone) { alert('Nombre y teléfono son obligatorios'); return; }
+
+    let accion = 'crear';
+    let datos = [Date.now(), name, phone, addr]; // ID nuevo si es crear
+    
+    if (id) {
+        accion = 'actualizar';
+        datos = [parseInt(id), name, phone, addr]; // Mantener ID original al editar
+    }
+
+    try {
+        await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ tipo: 'Clientes', accion: accion, datos: datos })
+        });
+        
+        alert(id ? 'Cliente Actualizado! ✨' : 'Cliente Agregado! ✨');
+        closeModal('clientModal');
+        
+        // Limpiar formulario
+        document.getElementById('cId').value = '';
+        document.getElementById('cName').value = '';
+        document.getElementById('cPhone').value = '';
+        document.getElementById('cAddr').value = '';
+        document.getElementById('modalTitle').innerText = 'Nuevo Cliente ✨';
+        
+        loadData(); // Recargar lista
+    } catch (e) {
+        alert('Error al guardar');
+    }
+}
+
+// Modifica la función openModal para limpiar el formulario si es para crear nuevo:
+function openModal(id) { 
+    if(id === 'clientModal') {
+        document.getElementById('cId').value = ''; 
+        document.getElementById('cName').value = '';
+        document.getElementById('cPhone').value = '';
+        document.getElementById('cAddr').value = '';
+        document.getElementById('modalTitle').innerText = 'Nuevo Cliente ✨';
+    }
+    document.getElementById(id).style.display = 'flex'; 
+}
+
+        
     </script>
 </body>
 </html>
