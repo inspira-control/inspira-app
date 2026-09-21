@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inspira | Detalles únicos </title>
+    <title>Inspira | Gestión Cute</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -11,7 +11,7 @@
             --lilac: #C3B1E1;
             --lilac-dark: #957DAD;
             --mint: #A8E6CF;
-            --mint-dark: #3D84A8; /* Un poco más azulado para contraste */
+            --mint-dark: #3D84A8;
             --bg: #FDFBF7;
             --text: #4A4A4A;
             --white: #FFFFFF;
@@ -29,7 +29,6 @@
             align-items: center;
         }
 
-        /* HEADER */
         .header {
             text-align: center;
             margin-bottom: 30px;
@@ -44,7 +43,6 @@
         }
         .tagline { color: #888; font-size: 0.9rem; }
 
-        /* LOGIN OVERLAY */
         .login-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);
@@ -72,8 +70,7 @@
         .btn-success { background: var(--mint); color: var(--text); }
         .btn-whatsapp { background: #25D366; color: white; }
 
-        /* LAYOUT */
-        .container { width: 100%; max-width: 1200px; display: none; } /* Oculto hasta login */
+        .container { width: 100%; max-width: 1200px; display: none; }
         
         .tabs {
             display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; flex-wrap: wrap;
@@ -94,7 +91,6 @@
         .card img { width: 100%; height: 150px; object-fit: cover; border-radius: 15px; margin-bottom: 10px;}
         .price-tag { color: var(--mint-dark); font-weight: 800; font-size: 1.2rem; }
 
-        /* MODAL / FORMS */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000;
@@ -104,24 +100,43 @@
             max-height: 90vh; overflow-y: auto;
         }
 
-        /* CART */
         .cart-float {
             position: fixed; bottom: 20px; right: 20px; background: var(--lilac-dark);
             color: white; padding: 15px 25px; border-radius: 50px; cursor: pointer;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2); font-weight: bold; z-index: 100;
         }
 
-        /* TABLES */
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; box-shadow: var(--shadow);}
         th { background: var(--mint); color: var(--text); padding: 15px; text-align: left;}
         td { padding: 15px; border-bottom: 1px solid #eee; }
         
         .status-badge { padding: 5px 10px; border-radius: 10px; font-size: 0.8rem; font-weight: bold;}
-        .status-pending { background: #FFE5E5; color: #D32F2F; }
-        .status-progress { background: #FFF3E0; color: #F57C00; }
-        .status-done { background: #E8F5E9; color: #388E3C; }
+        .status-pendiente { background: #FFE5E5; color: #D32F2F; }
+        .status-proceso { background: #FFF3E0; color: #F57C00; }
+        .status-completado { background: #E8F5E9; color: #388E3C; }
+        .status-entregado { background: #E3F2FD; color: #1976D2; }
 
-        /* Loader Cute */
+        .search-container { margin-bottom: 20px; display: flex; gap: 10px; }
+        .search-container input { flex-grow: 1; }
+
+        .btn-action {
+            padding: 8px 12px; border: none; border-radius: 10px; cursor: pointer; margin-right: 5px; font-size: 0.9rem;
+        }
+        .btn-edit { background: var(--lilac); color: white; }
+        .btn-delete { background: #FF6B6B; color: white; }
+        .btn-status { background: var(--mint); color: var(--text); }
+        .btn-action:hover { opacity: 0.8; }
+
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white; padding: 25px; border-radius: 20px;
+            box-shadow: var(--shadow); text-align: center;
+        }
+        .stat-value { font-size: 2rem; font-weight: 800; color: var(--lilac-dark); }
+        .stat-label { color: #888; font-size: 0.9rem; margin-top: 5px; }
+
         .loader-container {
             display: flex; justify-content: center; align-items: center;
             height: 200px; width: 100%;
@@ -138,20 +153,18 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Estilos para búsqueda y botones de acción */
-        .search-container { margin-bottom: 20px; display: flex; gap: 10px; }
-        .search-container input { flex-grow: 1; }
-
-        .btn-action {
-            padding: 8px 12px; border: none; border-radius: 10px; cursor: pointer; margin-right: 5px; font-size: 0.9rem;
+        .payment-badge {
+            display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 600;
         }
-        .btn-edit { background: var(--lilac); color: white; }
-        .btn-delete { background: #FF6B6B; color: white; }
-        .btn-action:hover { opacity: 0.8; }
+        .payment-efectivo { background: #FFF9C4; color: #F57F17; }
+        .payment-transferencia { background: #E1F5FE; color: #0277BD; }
 
-        /* Ocultar input oculto */
-        .hidden { display: none; }
-      
+        /* Vista pública - ocultar elementos admin */
+        .admin-only { display: none; }
+        .public-view .admin-only { display: none !important; }
+        .public-view .tabs { display: none !important; }
+        .public-view #tab-catalogo { display: block !important; }
+        .public-view #cartFloat { display: block !important; }
     </style>
 </head>
 <body>
@@ -164,7 +177,7 @@
             <input type="password" id="passInput" class="input-cute" placeholder="Contraseña">
             <button class="btn btn-primary" onclick="login()">Entrar</button>
             <br><br>
-            <button class="btn btn-success" onclick="showPublic()">Ver Catálogo (Público)</button>
+            <button class="btn btn-success" onclick="showPublic()">Ver Catálogo</button>
         </div>
     </div>
 
@@ -175,57 +188,81 @@
             <p class="tagline">Gestión de Pedidos & Clientes 💜</p>
         </div>
 
-        <div class="tabs">
+        <div class="tabs admin-only">
             <button class="tab-btn active" onclick="showTab('catalogo')">🛍️ Catálogo</button>
             <button class="tab-btn" onclick="showTab('pedidos')">📦 Pedidos</button>
-            <button class="tab-btn" onclick="showTab('clientes')">👥 Clientes</button>
+            <button class="tab-btn" onclick="showTab('clientes')"> Clientes</button>
             <button class="tab-btn" onclick="showTab('inventario')">📊 Inventario</button>
+            <button class="tab-btn" onclick="showTab('analisis')">📈 Análisis</button>
         </div>
 
         <!-- SECCIÓN CATÁLOGO -->
         <div id="tab-catalogo" class="tab-content">
-        <div id="loadingSpinner" class="loader-container">
-        <div class="loader"></div>
+            <div id="loadingSpinner" class="loader-container">
+                <div class="loader"></div>
                 <p style="margin-left: 15px; color: var(--lilac-dark); font-weight: bold;">Cargando productos mágicos... ✨</p>
-        </div>
-            <div class="grid" id="productGrid">
-                <!-- Productos cargados por JS -->
+            </div>
+            <div class="grid" id="productGrid" style="display:none">
             </div>
         </div>
 
         <!-- SECCIÓN PEDIDOS -->
-        <div id="tab-pedidos" class="tab-content" style="display:none">
+        <div id="tab-pedidos" class="tab-content admin-only" style="display:none">
             <h3>Pedidos Recientes</h3>
             <table id="ordersTable">
                 <thead>
-                    <tr><th>Fecha</th><th>Cliente</th><th>Total</th><th>Pagado</th><th>Status</th><th>Acción</th></tr>
+                    <tr><th>ID</th><th>Fecha</th><th>Cliente</th><th>Total</th><th>Anticipo</th><th>Restante</th><th>Pago</th><th>Status</th><th>Acciones</th></tr>
                 </thead>
                 <tbody></tbody>
             </table>
         </div>
 
         <!-- SECCIÓN CLIENTES -->
-        <div id="tab-clientes" class="tab-content" style="display:none">
+        <div id="tab-clientes" class="tab-content admin-only" style="display:none">
             <div class="search-container">
-            <button class="btn btn-primary" onclick="openModal('clientModal')">+ Nuevo Cliente</button>
-            <input type="text" id="searchClient" class="input-cute" placeholder=" Buscar por nombre o teléfono..." onkeyup="filterClients()">
-        </div>
-    
-        <table id="clientsTable" style="margin-top:20px">
-            <thead>
-                <tr><th>Nombre</th><th>Teléfono</th><th>Dirección</th><th>Acciones</th></tr>
-            </thead>
-        <tbody></tbody>
-        </table>
-        </div>
-        
-        <!-- SECCIÓN INVENTARIO -->
-        <div id="tab-inventario" class="tab-content" style="display:none">
-            <h3>Stock Actual</h3>
-            <table id="inventoryTable">
-                <thead><tr><th>Producto</th><th>Stock</th></tr></thead>
+                <button class="btn btn-primary" onclick="openModal('clientModal')">+ Nuevo Cliente</button>
+                <input type="text" id="searchClient" class="input-cute" placeholder="🔍 Buscar por nombre o teléfono..." onkeyup="filterClients()">
+            </div>
+            
+            <table id="clientsTable" style="margin-top:20px">
+                <thead>
+                    <tr><th>Nombre</th><th>Teléfono</th><th>Dirección</th><th>Acciones</th></tr>
+                </thead>
                 <tbody></tbody>
             </table>
+        </div>
+
+        <!-- SECCIÓN INVENTARIO -->
+        <div id="tab-inventario" class="tab-content admin-only" style="display:none">
+            <h3>Control de Inventario</h3>
+            <table id="inventoryTable">
+                <thead><tr><th>Producto</th><th>Stock Actual</th><th>Precio</th><th>Acción</th></tr></thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <!-- SECCIÓN ANÁLISIS -->
+        <div id="tab-analisis" class="tab-content admin-only" style="display:none">
+            <h3>Análisis de Ventas 📊</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statTotalVentas">$0</div>
+                    <div class="stat-label">Total Ventas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statPorCobrar">$0</div>
+                    <div class="stat-label">Por Cobrar</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statTotalPedidos">0</div>
+                    <div class="stat-label">Total Pedidos</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h4>🏆 Productos Más Vendidos</h4>
+                <div id="topProductos"></div>
+            </div>
         </div>
     </div>
 
@@ -241,7 +278,12 @@
             <label>Cliente:</label>
             <select id="selectClient" class="input-cute"></select>
             <label>Anticipo:</label>
-            <input type="number" id="inputAnticipo" class="input-cute" value="0">
+            <input type="number" id="inputAnticipo" class="input-cute" value="0" min="0">
+            <label>Forma de Pago:</label>
+            <select id="selectPago" class="input-cute">
+                <option value="Efectivo"> Efectivo</option>
+                <option value="Transferencia">🏦 Transferencia</option>
+            </select>
             <div id="orderSummary"></div>
             <button class="btn btn-whatsapp" onclick="sendWhatsApp()"><i class="fab fa-whatsapp"></i> Enviar Pedido</button>
             <button class="btn btn-primary" onclick="saveOrder()">Guardar en Sistema</button>
@@ -251,72 +293,91 @@
 
     <!-- MODAL CLIENTE -->
     <div id="clientModal" class="modal">
-    <div class="modal-content">
-        <h2 id="modalTitle">Nuevo Cliente ✨</h2>
-        <input type="hidden" id="cId"> <!-- Campo oculto para el ID -->
-        <input type="text" id="cName" class="input-cute" placeholder="Nombre">
-        <input type="text" id="cPhone" class="input-cute" placeholder="Teléfono">
-        <input type="text" id="cAddr" class="input-cute" placeholder="Dirección">
-        <button class="btn btn-primary" onclick="saveClient()">Guardar</button>
-        <button class="btn" style="background:#eee" onclick="closeModal('clientModal')">Cerrar</button>
+        <div class="modal-content">
+            <h2 id="modalTitle">Nuevo Cliente ✨</h2>
+            <input type="hidden" id="cId">
+            <input type="text" id="cName" class="input-cute" placeholder="Nombre">
+            <input type="text" id="cPhone" class="input-cute" placeholder="Teléfono">
+            <input type="text" id="cAddr" class="input-cute" placeholder="Dirección">
+            <button class="btn btn-primary" onclick="saveClient()">Guardar</button>
+            <button class="btn" style="background:#eee" onclick="closeModal('clientModal')">Cerrar</button>
+        </div>
     </div>
-</div>
+
+    <!-- MODAL EDITAR STOCK -->
+    <div id="stockModal" class="modal">
+        <div class="modal-content">
+            <h2>Actualizar Stock 📦</h2>
+            <input type="hidden" id="stockProductId">
+            <p id="stockProductName"></p>
+            <label>Nuevo Stock:</label>
+            <input type="number" id="newStock" class="input-cute" min="0">
+            <button class="btn btn-primary" onclick="updateStock()">Actualizar</button>
+            <button class="btn" style="background:#eee" onclick="closeModal('stockModal')">Cancelar</button>
+        </div>
+    </div>
 
     <script>
-        // CONFIGURACIÓN
-        const API_URL = "https://script.google.com/macros/s/AKfycbwz8Y582w5SJN6S-3GJY6D963mziMQuEF4zkw11x_6DW6IhtxmDWKdOgSsIqE-XSA/exec"; // PEGA AQUÍ LA URL DEL PASO 2
-        const ADMIN_PASS = "inspira1403";
+        const API_URL = "https://script.google.com/macros/s/AKfycbwz8Y582w5SJN6S-3GJY6D963mziMQuEF4zkw11x_6DW6IhtxmDWKdOgSsIqE-XSA/exec"; // PEGA AQUÍ TU URL
+        const ADMIN_PASS = "inspira2024";
         
         let products = [];
         let clients = [];
+        let orders = [];
         let cart = [];
+        let isAdmin = false;
 
-        // --- LOGIN ---
         function login() {
             const pass = document.getElementById('passInput').value;
             if (pass === ADMIN_PASS) {
+                isAdmin = true;
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('appContainer').style.display = 'block';
+                document.getElementById('appContainer').classList.remove('public-view');
                 loadData();
             } else {
-                alert("Contraseña incorrecta 🥺");
+                alert("Contraseña incorrecta ");
             }
         }
 
         function showPublic() {
+            isAdmin = false;
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').style.display = 'block';
-            // Ocultar tabs admin solo para vista pública (opcional)
-            loadData(); 
+            document.getElementById('appContainer').classList.add('public-view');
+            document.getElementById('cartFloat').style.display = 'block';
+            loadData();
         }
 
-        // --- DATA LOADING ---
         async function loadData() {
-            // Mostrar el spinner
             document.getElementById('loadingSpinner').style.display = 'flex';
             
             try {
-                // Cargar Productos
                 const resP = await fetch(`${API_URL}?tipo=Productos`);
                 products = await resP.json();
                 renderProducts();
                 renderInventory();
 
-                // Cargar Clientes
                 const resC = await fetch(`${API_URL}?tipo=Clientes`);
                 clients = await resC.json();
                 renderClients();
                 populateClientSelect();
+
+                if (isAdmin) {
+                    const resO = await fetch(`${API_URL}?tipo=Pedidos`);
+                    orders = await resO.json();
+                    renderOrders();
+                    loadSalesAnalysis();
+                }
             } catch (e) {
                 console.error("Error cargando datos", e);
-                alert("Hubo un error al cargar los datos. Revisa tu conexión o la API.");
+                alert("Error al cargar datos. Revisa la consola.");
             } finally {
-                // Ocultar el spinner cuando termine (exite o falle)
                 document.getElementById('loadingSpinner').style.display = 'none';
+                document.getElementById('productGrid').style.display = 'grid';
             }
         }
 
-        // --- RENDERIZADO ---
         function renderProducts() {
             const grid = document.getElementById('productGrid');
             grid.innerHTML = products.map(p => `
@@ -325,25 +386,54 @@
                     <h4>${p.Nombre}</h4>
                     <p class="price-tag">$${p.Precio}</p>
                     <p style="font-size:0.8rem; color:#888">Stock: ${p.Stock}</p>
-                    <button class="btn btn-success" style="width:100%; margin-top:10px" onclick="addToCart(${p.ID})">Agregar 🛍️</button>
+                    ${isAdmin ? '' : `<button class="btn btn-success" style="width:100%; margin-top:10px" onclick="addToCart(${p.ID})">Agregar 🛍️</button>`}
                 </div>
             `).join('');
         }
 
-       function renderClients(dataToRender = clients) {
-    const tbody = document.querySelector('#clientsTable tbody');
-    tbody.innerHTML = dataToRender.map(c => `
-        <tr>
-            <td>${c.Nombre}</td>
-            <td>${c.Telefono}</td>
-            <td>${c.Direccion}</td>
-            <td>
-                <button class="btn-action btn-edit" onclick="editClient(${c.ID})"><i class="fas fa-edit"></i></button>
-                <button class="btn-action btn-delete" onclick="deleteClient(${c.ID})"><i class="fas fa-trash"></i></button>
-            </td>
-        </tr>
-    `).join('');
-}
+        function renderClients(dataToRender = clients) {
+            const tbody = document.querySelector('#clientsTable tbody');
+            tbody.innerHTML = dataToRender.map(c => `
+                <tr>
+                    <td>${c.Nombre}</td>
+                    <td>${c.Telefono}</td>
+                    <td>${c.Direccion}</td>
+                    <td>
+                        <button class="btn-action btn-edit" onclick="editClient(${c.ID})"><i class="fas fa-edit"></i></button>
+                        <button class="btn-action btn-delete" onclick="deleteClient(${c.ID})"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderOrders() {
+            const tbody = document.querySelector('#ordersTable tbody');
+            tbody.innerHTML = orders.map(o => {
+                const restante = (parseFloat(o.Total) || 0) - (parseFloat(o.Anticipo) || 0);
+                const statusClass = 'status-' + (o.Status || 'pendiente').toLowerCase().replace(' ', '-');
+                const pagoClass = (o.FormaPago === 'Transferencia') ? 'payment-transferencia' : 'payment-efectivo';
+                
+                return `
+                <tr>
+                    <td>${o.ID}</td>
+                    <td>${o.Fecha}</td>
+                    <td>${getClienteName(o.ClienteID)}</td>
+                    <td>$${o.Total}</td>
+                    <td>$${o.Anticipo}</td>
+                    <td style="color:${restante > 0 ? '#D32F2F' : '#388E3C'}; font-weight:bold">$${restante}</td>
+                    <td><span class="payment-badge ${pagoClass}">${o.FormaPago || 'Efectivo'}</span></td>
+                    <td><span class="status-badge ${statusClass}">${o.Status || 'Pendiente'}</span></td>
+                    <td>
+                        <button class="btn-action btn-status" onclick="changeStatus(${o.ID})">Cambiar</button>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        function getClienteName(clientId) {
+            const client = clients.find(c => c.ID == clientId);
+            return client ? client.Nombre : 'N/A';
+        }
 
         function renderInventory() {
             const tbody = document.querySelector('#inventoryTable tbody');
@@ -351,6 +441,10 @@
                 <tr>
                     <td>${p.Nombre}</td>
                     <td>${p.Stock}</td>
+                    <td>$${p.Precio}</td>
+                    <td>
+                        <button class="btn-action btn-edit" onclick="openStockModal(${p.ID}, '${p.Nombre}', ${p.Stock})">Editar Stock</button>
+                    </td>
                 </tr>
             `).join('');
         }
@@ -360,9 +454,12 @@
             sel.innerHTML = clients.map(c => `<option value="${c.ID}">${c.Nombre} - ${c.Telefono}</option>`).join('');
         }
 
-        // --- CARRITO & PEDIDOS ---
         function addToCart(id) {
             const prod = products.find(p => p.ID == id);
+            if (prod.Stock <= 0) {
+                alert('Producto sin stock 😢');
+                return;
+            }
             cart.push(prod);
             document.getElementById('cartFloat').style.display = 'block';
             document.getElementById('cartCount').innerText = cart.length;
@@ -383,6 +480,7 @@
             const clientId = document.getElementById('selectClient').value;
             const client = clients.find(c => c.ID == clientId);
             const anticipo = document.getElementById('inputAnticipo').value;
+            const pago = document.getElementById('selectPago').value;
             const total = cart.reduce((sum, item) => sum + parseFloat(item.Precio), 0);
             
             let msg = `✨ *NUEVO PEDIDO INSPIRA* ✨\n\n`;
@@ -394,6 +492,7 @@
             msg += `\n*Total:* $${total}\n`;
             msg += `*Anticipo:* $${anticipo}\n`;
             msg += `*Restante:* $${total - anticipo}\n`;
+            msg += `*Pago:* ${pago}\n`;
 
             const url = `https://wa.me/${client.Telefono}?text=${encodeURIComponent(msg)}`;
             window.open(url, '_blank');
@@ -402,38 +501,167 @@
         async function saveOrder() {
             const clientId = document.getElementById('selectClient').value;
             const anticipo = document.getElementById('inputAnticipo').value;
+            const pago = document.getElementById('selectPago').value;
             const total = cart.reduce((sum, item) => sum + parseFloat(item.Precio), 0);
             const detalle = cart.map(i => i.Nombre).join(', ');
+            const fecha = new Date().toLocaleDateString();
+            const id = Date.now();
             
-            const data = [new Date().toLocaleDateString(), clientId, detalle, total, anticipo, 'Pendiente'];
+            const data = [id, fecha, clientId, detalle, total, anticipo, 'Pendiente', pago];
             
-            await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ tipo: 'Pedidos', accion: 'crear', datos: data })
-            });
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ tipo: 'Pedidos', accion: 'crear', datos: data })
+                });
+                
+                alert('Pedido Guardado! 💜');
+                cart = [];
+                document.getElementById('cartFloat').style.display = 'none';
+                closeModal('orderModal');
+                loadData();
+            } catch (e) {
+                alert('Error al guardar pedido');
+            }
+        }
+
+        async function changeStatus(id) {
+            const newStatus = prompt('Nuevo status (Pendiente, En proceso, Completado, Entregado):', 'En proceso');
+            if (!newStatus) return;
             
-            alert('Pedido Guardado! 💜');
-            cart = [];
-            document.getElementById('cartFloat').style.display = 'none';
-            closeModal('orderModal');
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ tipo: 'Pedidos', accion: 'actualizarStatus', id: id, status: newStatus })
+                });
+                alert('Status actualizado ✨');
+                loadData();
+            } catch (e) {
+                alert('Error al actualizar');
+            }
+        }
+
+        async function loadSalesAnalysis() {
+            try {
+                const res = await fetch(`${API_URL}?tipo=Analysis`);
+                const data = await res.json();
+                
+                if (data.error) {
+                    document.getElementById('statTotalVentas').innerText = '$' + (data.totalVentas || 0);
+                    document.getElementById('statPorCobrar').innerText = '$' + (data.totalPorCobrar || 0);
+                    document.getElementById('statTotalPedidos').innerText = data.totalPedidos || 0;
+                    
+                    const topDiv = document.getElementById('topProductos');
+                    if (data.topProductos && data.topProductos.length > 0) {
+                        topDiv.innerHTML = data.topProductos.map((p, i) => 
+                            `<div style="padding:10px; border-bottom:1px solid #eee">
+                                <strong>${i+1}. ${p.nombre}</strong> - ${p.cantidad} ventas
+                            </div>`
+                        ).join('');
+                    } else {
+                        topDiv.innerHTML = '<p style="color:#888">No hay datos suficientes</p>';
+                    }
+                }
+            } catch (e) {
+                console.error('Error en análisis', e);
+            }
+        }
+
+        function filterClients() {
+            const term = document.getElementById('searchClient').value.toLowerCase();
+            const filtered = clients.filter(c => 
+                c.Nombre.toLowerCase().includes(term) || 
+                c.Telefono.toString().includes(term)
+            );
+            renderClients(filtered);
+        }
+
+        function editClient(id) {
+            const client = clients.find(c => c.ID == id);
+            if (client) {
+                document.getElementById('modalTitle').innerText = 'Editar Cliente ✏️';
+                document.getElementById('cId').value = client.ID;
+                document.getElementById('cName').value = client.Nombre;
+                document.getElementById('cPhone').value = client.Telefono;
+                document.getElementById('cAddr').value = client.Direccion;
+                document.getElementById('clientModal').style.display = 'flex';
+            }
+        }
+
+        async function deleteClient(id) {
+            if(confirm('¿Eliminar este cliente?')) {
+                try {
+                    await fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ tipo: 'Clientes', accion: 'eliminar', datos: id })
+                    });
+                    alert('Cliente eliminado ️');
+                    loadData();
+                } catch (e) {
+                    alert('Error al eliminar');
+                }
+            }
         }
 
         async function saveClient() {
+            const id = document.getElementById('cId').value;
             const name = document.getElementById('cName').value;
             const phone = document.getElementById('cPhone').value;
             const addr = document.getElementById('cAddr').value;
             
-            const data = [Date.now(), name, phone, addr];
-            await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ tipo: 'Clientes', accion: 'crear', datos: data })
-            });
-            alert('Cliente Agregado! ✨');
-            closeModal('clientModal');
-            loadData();
+            if(!name || !phone) { alert('Nombre y teléfono son obligatorios'); return; }
+
+            let accion = 'crear';
+            let datos = [Date.now(), name, phone, addr];
+            
+            if (id) {
+                accion = 'actualizar';
+                datos = [parseInt(id), name, phone, addr];
+            }
+
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ tipo: 'Clientes', accion: accion, datos: datos })
+                });
+                
+                alert(id ? 'Cliente Actualizado! ✨' : 'Cliente Agregado! ✨');
+                closeModal('clientModal');
+                document.getElementById('cId').value = '';
+                document.getElementById('cName').value = '';
+                document.getElementById('cPhone').value = '';
+                document.getElementById('cAddr').value = '';
+                document.getElementById('modalTitle').innerText = 'Nuevo Cliente ✨';
+                loadData();
+            } catch (e) {
+                alert('Error al guardar');
+            }
         }
 
-        // --- UI HELPERS ---
+        function openStockModal(id, name, stock) {
+            document.getElementById('stockProductId').value = id;
+            document.getElementById('stockProductName').innerText = 'Producto: ' + name;
+            document.getElementById('newStock').value = stock;
+            document.getElementById('stockModal').style.display = 'flex';
+        }
+
+        async function updateStock() {
+            const id = document.getElementById('stockProductId').value;
+            const newStock = parseInt(document.getElementById('newStock').value);
+            
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ tipo: 'Productos', accion: 'actualizarStock', id: id, stock: newStock })
+                });
+                alert('Stock actualizado 📦');
+                closeModal('stockModal');
+                loadData();
+            } catch (e) {
+                alert('Error al actualizar stock');
+            }
+        }
+
         function showTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -441,100 +669,17 @@
             event.target.classList.add('active');
         }
 
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
-        // Función para buscar clientes
-function filterClients() {
-    const term = document.getElementById('searchClient').value.toLowerCase();
-    const filtered = clients.filter(c => 
-        c.Nombre.toLowerCase().includes(term) || 
-        c.Telefono.toString().includes(term)
-    );
-    renderClients(filtered);
-}
-
-// Función para cargar datos en el modal y editar
-function editClient(id) {
-    const client = clients.find(c => c.ID == id);
-    if (client) {
-        document.getElementById('modalTitle').innerText = 'Editar Cliente ✏️';
-        document.getElementById('cId').value = client.ID;
-        document.getElementById('cName').value = client.Nombre;
-        document.getElementById('cPhone').value = client.Telefono;
-        document.getElementById('cAddr').value = client.Direccion;
-        document.getElementById('clientModal').style.display = 'flex';
-    }
-}
-
-// Función para eliminar cliente
-async function deleteClient(id) {
-    if(confirm('¿Seguro que deseas eliminar este cliente? Esta acción no se puede deshacer.')) {
-        try {
-            await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ tipo: 'Clientes', accion: 'eliminar', datos: id })
-            });
-            alert('Cliente eliminado 🗑️');
-            loadData(); // Recargar la lista
-        } catch (e) {
-            alert('Error al eliminar');
+        function openModal(id) { 
+            if(id === 'clientModal') {
+                document.getElementById('cId').value = ''; 
+                document.getElementById('cName').value = '';
+                document.getElementById('cPhone').value = '';
+                document.getElementById('cAddr').value = '';
+                document.getElementById('modalTitle').innerText = 'Nuevo Cliente ✨';
+            }
+            document.getElementById(id).style.display = 'flex'; 
         }
-    }
-}
-
-// Modifica tu función saveClient existente por esta (ahora detecta si es editar o crear):
-async function saveClient() {
-    const id = document.getElementById('cId').value;
-    const name = document.getElementById('cName').value;
-    const phone = document.getElementById('cPhone').value;
-    const addr = document.getElementById('cAddr').value;
-    
-    if(!name || !phone) { alert('Nombre y teléfono son obligatorios'); return; }
-
-    let accion = 'crear';
-    let datos = [Date.now(), name, phone, addr]; // ID nuevo si es crear
-    
-    if (id) {
-        accion = 'actualizar';
-        datos = [parseInt(id), name, phone, addr]; // Mantener ID original al editar
-    }
-
-    try {
-        await fetch(API_URL, {
-            method: 'POST',
-            body: JSON.stringify({ tipo: 'Clientes', accion: accion, datos: datos })
-        });
-        
-        alert(id ? 'Cliente Actualizado! ✨' : 'Cliente Agregado! ✨');
-        closeModal('clientModal');
-        
-        // Limpiar formulario
-        document.getElementById('cId').value = '';
-        document.getElementById('cName').value = '';
-        document.getElementById('cPhone').value = '';
-        document.getElementById('cAddr').value = '';
-        document.getElementById('modalTitle').innerText = 'Nuevo Cliente ✨';
-        
-        loadData(); // Recargar lista
-    } catch (e) {
-        alert('Error al guardar');
-    }
-}
-
-// Modifica la función openModal para limpiar el formulario si es para crear nuevo:
-function openModal(id) { 
-    if(id === 'clientModal') {
-        document.getElementById('cId').value = ''; 
-        document.getElementById('cName').value = '';
-        document.getElementById('cPhone').value = '';
-        document.getElementById('cAddr').value = '';
-        document.getElementById('modalTitle').innerText = 'Nuevo Cliente ✨';
-    }
-    document.getElementById(id).style.display = 'flex'; 
-}
-
-        
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     </script>
 </body>
 </html>
