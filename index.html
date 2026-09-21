@@ -365,34 +365,38 @@ function showPublic() {
     loadData();
 }
 
-        async function loadData() {
-            document.getElementById('loadingSpinner').style.display = 'flex';
-            
-            try {
-                const resP = await fetch(`${API_URL}?tipo=Productos`);
-                products = await resP.json();
-                renderProducts();
-                renderInventory();
+async function loadData() {
+    document.getElementById('loadingSpinner').style.display = 'flex';
+    console.log('🔄 Cargando datos...');
+    
+    try {
+        const resP = await fetch(`${API_URL}?tipo=Productos`);
+        products = await resP.json();
+        console.log('📦 Productos cargados:', products);
+        renderProducts();
+        renderInventory();
 
-                const resC = await fetch(`${API_URL}?tipo=Clientes`);
-                clients = await resC.json();
-                renderClients();
-                populateClientSelect();
+        const resC = await fetch(`${API_URL}?tipo=Clientes`);
+        clients = await resC.json();
+        console.log('👥 Clientes cargados:', clients);
+        renderClients();
+        populateClientSelect();
 
-                if (isAdmin) {
-                    const resO = await fetch(`${API_URL}?tipo=Pedidos`);
-                    orders = await resO.json();
-                    renderOrders();
-                    loadSalesAnalysis();
-                }
-            } catch (e) {
-                console.error("Error cargando datos", e);
-                alert("Error al cargar datos. Revisa la consola.");
-            } finally {
-                document.getElementById('loadingSpinner').style.display = 'none';
-                document.getElementById('productGrid').style.display = 'grid';
-            }
+        if (isAdmin) {
+            const resO = await fetch(`${API_URL}?tipo=Pedidos`);
+            orders = await resO.json();
+            console.log('📋 Pedidos cargados:', orders);
+            renderOrders();
+            loadSalesAnalysis();
         }
+    } catch (e) {
+        console.error("❌ Error cargando datos", e);
+        alert("Error al cargar datos. Revisa la consola (F12).");
+    } finally {
+        document.getElementById('loadingSpinner').style.display = 'none';
+        document.getElementById('productGrid').style.display = 'grid';
+    }
+}
 
         function renderProducts() {
             const grid = document.getElementById('productGrid');
@@ -423,28 +427,48 @@ function showPublic() {
         }
 
         function renderOrders() {
-            const tbody = document.querySelector('#ordersTable tbody');
-            tbody.innerHTML = orders.map(o => {
-                const restante = (parseFloat(o.Total) || 0) - (parseFloat(o.Anticipo) || 0);
-                const statusClass = 'status-' + (o.Status || 'pendiente').toLowerCase().replace(' ', '-');
-                const pagoClass = (o.FormaPago === 'Transferencia') ? 'payment-transferencia' : 'payment-efectivo';
-                
-                return `
-                <tr>
-                    <td>${o.ID}</td>
-                    <td>${o.Fecha}</td>
-                    <td>${getClienteName(o.ClienteID)}</td>
-                    <td>$${o.Total}</td>
-                    <td>$${o.Anticipo}</td>
-                    <td style="color:${restante > 0 ? '#D32F2F' : '#388E3C'}; font-weight:bold">$${restante}</td>
-                    <td><span class="payment-badge ${pagoClass}">${o.FormaPago || 'Efectivo'}</span></td>
-                    <td><span class="status-badge ${statusClass}">${o.Status || 'Pendiente'}</span></td>
-                    <td>
-                        <button class="btn-action btn-status" onclick="changeStatus(${o.ID})">Cambiar</button>
-                    </td>
-                </tr>
-            `}).join('');
-        }
+    const tbody = document.querySelector('#ordersTable tbody');
+    
+    if (!orders || orders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 30px;">No hay pedidos registrados</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = orders.map(o => {
+        // Asegurar que los valores existan
+        const id = o.ID || 'N/A';
+        const fecha = o.Fecha || 'N/A';
+        const clienteID = o.ClienteID || '';
+        const total = parseFloat(o.Total) || 0;
+        const anticipo = parseFloat(o.Anticipo) || 0;
+        const restante = total - anticipo;
+        const status = o.Status || 'Pendiente';
+        const formaPago = o.FormaPago || 'Efectivo';
+        
+        // Obtener nombre del cliente
+        const cliente = clients.find(c => c.ID == clienteID);
+        const clienteNombre = cliente ? cliente.Nombre : 'Cliente no encontrado';
+        
+        // Clases para status y pago
+        const statusClass = 'status-' + status.toLowerCase().replace(' ', '-');
+        const pagoClass = (formaPago === 'Transferencia') ? 'payment-transferencia' : 'payment-efectivo';
+        
+        return `
+        <tr>
+            <td>${id}</td>
+            <td>${fecha}</td>
+            <td>${clienteNombre}</td>
+            <td>$${total}</td>
+            <td>$${anticipo}</td>
+            <td style="color:${restante > 0 ? '#D32F2F' : '#388E3C'}; font-weight:bold">$${restante}</td>
+            <td><span class="payment-badge ${pagoClass}">${formaPago}</span></td>
+            <td><span class="status-badge ${statusClass}">${status}</span></td>
+            <td>
+                <button class="btn-action btn-status" onclick="changeStatus('${id}')">Cambiar</button>
+            </td>
+        </tr>
+    `}).join('');
+}
 
         function getClienteName(clientId) {
             const client = clients.find(c => c.ID == clientId);
@@ -542,20 +566,44 @@ function showPublic() {
         }
 
         async function changeStatus(id) {
-            const newStatus = prompt('Nuevo status (Pendiente, En proceso, Completado, Entregado):', 'En proceso');
-            if (!newStatus) return;
-            
-            try {
-                await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ tipo: 'Pedidos', accion: 'actualizarStatus', id: id, status: newStatus })
-                });
-                alert('Status actualizado ✨');
-                loadData();
-            } catch (e) {
-                alert('Error al actualizar');
-            }
+    console.log('Cambiando status del pedido:', id);
+    
+    const currentOrder = orders.find(o => o.ID == id);
+    const currentStatus = currentOrder ? currentOrder.Status : 'Pendiente';
+    
+    const newStatus = prompt('Nuevo status del pedido:\n(Pendiente, En proceso, Completado, Entregado)', currentStatus);
+    
+    if (!newStatus || newStatus.trim() === '') {
+        return; // Usuario canceló
+    }
+    
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                tipo: 'Pedidos', 
+                accion: 'actualizarStatus', 
+                id: id.toString(), 
+                status: newStatus.trim() 
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'statusUpdated' || result.status === 'success') {
+            alert('✅ Status actualizado a: ' + newStatus);
+            loadData(); // Recargar datos
+        } else {
+            alert(' Error al actualizar: ' + (result.message || 'Error desconocido'));
         }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Error de conexión. Revisa la consola (F12)');
+    }
+}
 
         async function loadSalesAnalysis() {
             try {
