@@ -160,7 +160,10 @@
         .payment-transferencia { background: #E1F5FE; color: #0277BD; }
 
         /* Vista pública - ocultar elementos admin */
+        /* Vista pública - ocultar elementos admin */
         .admin-only { display: none; }
+        .admin-visible .admin-only { display: block !important; }
+        .admin-visible .tabs { display: flex !important; }
         .public-view .admin-only { display: none !important; }
         .public-view .tabs { display: none !important; }
         .public-view #tab-catalogo { display: block !important; }
@@ -329,21 +332,23 @@
 
         function login() {
             const pass = document.getElementById('passInput').value;
-            if (pass === ADMIN_PASS) {
-                isAdmin = true;
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('appContainer').style.display = 'block';
-                document.getElementById('appContainer').classList.remove('public-view');
-                loadData();
-            } else {
-                alert("Contraseña incorrecta ");
+                if (pass === ADMIN_PASS) {
+                    isAdmin = true;
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('appContainer').style.display = 'block';
+                    document.getElementById('appContainer').classList.remove('public-view');
+                    document.getElementById('appContainer').classList.add('admin-visible'); // ← AGREGAR ESTA LÍNEA
+                    loadData();
+                } else {
+                    alert("Contraseña incorrecta 🥺");
+                }
             }
-        }
 
-        function showPublic() {
+       function showPublic() {
             isAdmin = false;
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').style.display = 'block';
+            document.getElementById('appContainer').classList.remove('admin-visible'); // ← AGREGAR ESTA LÍNEA
             document.getElementById('appContainer').classList.add('public-view');
             document.getElementById('cartFloat').style.display = 'block';
             loadData();
