@@ -164,6 +164,28 @@
         .public-view [data-admin="true"] { display: none !important; }
         .public-view #tab-catalogo { display: block !important; }
         .public-view #cartFloat { display: block !important; }
+    
+      /* Estilos para selects en tabla */
+td select.input-cute {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+td select.input-cute:hover {
+    border-color: var(--lilac);
+    box-shadow: 0 2px 5px rgba(195, 177, 225, 0.3);
+}
+
+td select.input-cute:focus {
+    outline: none;
+    border-color: var(--lilac-dark);
+}  
+        
     </style>
 </head>
 <body>
@@ -426,7 +448,7 @@ async function loadData() {
             `).join('');
         }
 
-        function renderOrders() {
+       function renderOrders() {
     const tbody = document.querySelector('#ordersTable tbody');
     
     if (!orders || orders.length === 0) {
@@ -435,7 +457,6 @@ async function loadData() {
     }
     
     tbody.innerHTML = orders.map(o => {
-        // Asegurar que los valores existan
         const id = o.ID || 'N/A';
         const fecha = o.Fecha || 'N/A';
         const clienteID = o.ClienteID || '';
@@ -445,13 +466,8 @@ async function loadData() {
         const status = o.Status || 'Pendiente';
         const formaPago = o.FormaPago || 'Efectivo';
         
-        // Obtener nombre del cliente
         const cliente = clients.find(c => c.ID == clienteID);
         const clienteNombre = cliente ? cliente.Nombre : 'Cliente no encontrado';
-        
-        // Clases para status y pago
-        const statusClass = 'status-' + status.toLowerCase().replace(' ', '-');
-        const pagoClass = (formaPago === 'Transferencia') ? 'payment-transferencia' : 'payment-efectivo';
         
         return `
         <tr>
@@ -461,15 +477,29 @@ async function loadData() {
             <td>$${total}</td>
             <td>$${anticipo}</td>
             <td style="color:${restante > 0 ? '#D32F2F' : '#388E3C'}; font-weight:bold">$${restante}</td>
-            <td><span class="payment-badge ${pagoClass}">${formaPago}</span></td>
-            <td><span class="status-badge ${statusClass}">${status}</span></td>
             <td>
-                <button class="btn-action btn-status" onclick="changeStatus('${id}')">Cambiar</button>
+                <select class="input-cute" style="padding: 5px; margin: 0; width: auto;" 
+                        onchange="updateOrderField('${id}', 'FormaPago', this.value)">
+                    <option value="Efectivo" ${formaPago === 'Efectivo' ? 'selected' : ''}>💵 Efectivo</option>
+                    <option value="Transferencia" ${formaPago === 'Transferencia' ? 'selected' : ''}>🏦 Transferencia</option>
+                </select>
+            </td>
+            <td>
+                <select class="input-cute" style="padding: 5px; margin: 0; width: auto;" 
+                        onchange="updateOrderField('${id}', 'Status', this.value)">
+                    <option value="Pendiente" ${status === 'Pendiente' ? 'selected' : ''}>⏳ Pendiente</option>
+                    <option value="En proceso" ${status === 'En proceso' ? 'selected' : ''}>🔄 En proceso</option>
+                    <option value="Completado" ${status === 'Completado' ? 'selected' : ''}>✅ Completado</option>
+                    <option value="Entregado" ${status === 'Entregado' ? 'selected' : ''}>📦 Entregado</option>
+                </select>
+            </td>
+            <td>
+                <button class="btn-action btn-edit" onclick="editOrder('${id}')">️ Editar</button>
             </td>
         </tr>
     `}).join('');
-}
-
+}        
+        
         function getClienteName(clientId) {
             const client = clients.find(c => c.ID == clientId);
             return client ? client.Nombre : 'N/A';
@@ -489,6 +519,105 @@ async function loadData() {
             `).join('');
         }
 
+async function updateOrderField(id, field, value) {
+    console.log(`🔄 Actualizando pedido ${id}: ${field} = ${value}`);
+    
+    try {
+        // Encontrar el pedido actual
+        const order = orders.find(o => o.ID == id);
+        if (!order) {
+            alert('❌ Pedido no encontrado');
+            return;
+        }
+        
+        // Crear el array de datos completo con el campo actualizado
+        const datos = [
+            order.ID,
+            order.Fecha,
+            order.ClienteID,
+            order.Detalle,
+            order.Total,
+            order.Anticipo,
+            field === 'Status' ? value : order.Status,
+            field === 'FormaPago' ? value : order.FormaPago
+        ];
+        
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                tipo: 'Pedidos', 
+                accion: 'actualizar', 
+                datos: datos 
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'updated' || result.status === 'success') {
+            console.log(`✅ ${field} actualizado a: ${value}`);
+            // Recargar datos para reflejar cambios
+            loadData();
+        } else {
+            alert('❌ Error al actualizar: ' + (result.message || 'Error desconocido'));
+        }
+    } catch (error) {
+        console.error('❌ Error:', error);
+        alert('Error de conexión. Revisa la consola (F12)');
+    }
+}
+
+function editOrder(id) {
+    const order = orders.find(o => o.ID == id);
+    if (!order) {
+        alert('Pedido no encontrado');
+        return;
+    }
+    
+    const nuevoAnticipo = prompt(`Editar anticipo del pedido:\n\nCliente: ${clients.find(c => c.ID == order.ClienteID)?.Nombre || 'N/A'}\nTotal: $${order.Total}\nAnticipo actual: $${order.Anticipo}\n\nIngresa el nuevo anticipo:`, order.Anticipo);
+    
+    if (nuevoAnticipo !== null && !isNaN(parseFloat(nuevoAnticipo))) {
+        const datos = [
+            order.ID,
+            order.Fecha,
+            order.ClienteID,
+            order.Detalle,
+            order.Total,
+            parseFloat(nuevoAnticipo),
+            order.Status,
+            order.FormaPago
+        ];
+        
+        fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                tipo: 'Pedidos', 
+                accion: 'actualizar', 
+                datos: datos 
+            })
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result.status === 'updated' || result.status === 'success') {
+                alert('✅ Anticipo actualizado');
+                loadData();
+            } else {
+                alert(' Error al actualizar');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Error de conexión');
+        });
+    }
+}
+        
+        
         function populateClientSelect() {
             const sel = document.getElementById('selectClient');
             sel.innerHTML = clients.map(c => `<option value="${c.ID}">${c.Nombre} - ${c.Telefono}</option>`).join('');
