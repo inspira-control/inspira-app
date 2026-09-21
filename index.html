@@ -159,13 +159,9 @@
         .payment-efectivo { background: #FFF9C4; color: #F57F17; }
         .payment-transferencia { background: #E1F5FE; color: #0277BD; }
 
-        /* Vista pública - ocultar elementos admin */
-        /* Vista pública - ocultar elementos admin */
-        .admin-only { display: none; }
-        .admin-visible .admin-only { display: block !important; }
-        .admin-visible .tabs { display: flex !important; }
-        .public-view .admin-only { display: none !important; }
-        .public-view .tabs { display: none !important; }
+      /* Vista pública - ocultar elementos admin */
+        .public-view #adminTabs { display: none !important; }
+        .public-view [data-admin="true"] { display: none !important; }
         .public-view #tab-catalogo { display: block !important; }
         .public-view #cartFloat { display: block !important; }
     </style>
@@ -191,10 +187,10 @@
             <p class="tagline">Gestión de Pedidos & Clientes 💜</p>
         </div>
 
-        <div class="tabs admin-only">
+        <div class="tabs" id="adminTabs" style="display:none">
             <button class="tab-btn active" onclick="showTab('catalogo')">🛍️ Catálogo</button>
             <button class="tab-btn" onclick="showTab('pedidos')">📦 Pedidos</button>
-            <button class="tab-btn" onclick="showTab('clientes')"> Clientes</button>
+            <button class="tab-btn" onclick="showTab('clientes')">👥 Clientes</button>
             <button class="tab-btn" onclick="showTab('inventario')">📊 Inventario</button>
             <button class="tab-btn" onclick="showTab('analisis')">📈 Análisis</button>
         </div>
@@ -210,7 +206,7 @@
         </div>
 
         <!-- SECCIÓN PEDIDOS -->
-        <div id="tab-pedidos" class="tab-content admin-only" style="display:none">
+        <div id="tab-pedidos" class="tab-content" data-admin="true" style="display:none">
             <h3>Pedidos Recientes</h3>
             <table id="ordersTable">
                 <thead>
@@ -221,7 +217,7 @@
         </div>
 
         <!-- SECCIÓN CLIENTES -->
-        <div id="tab-clientes" class="tab-content admin-only" style="display:none">
+        <div id="tab-clientes" class="tab-content" data-admin="true" style="display:none">
             <div class="search-container">
                 <button class="btn btn-primary" onclick="openModal('clientModal')">+ Nuevo Cliente</button>
                 <input type="text" id="searchClient" class="input-cute" placeholder="🔍 Buscar por nombre o teléfono..." onkeyup="filterClients()">
@@ -236,7 +232,7 @@
         </div>
 
         <!-- SECCIÓN INVENTARIO -->
-        <div id="tab-inventario" class="tab-content admin-only" style="display:none">
+        <div id="tab-inventario" class="tab-content" data-admin="true" style="display:none">
             <h3>Control de Inventario</h3>
             <table id="inventoryTable">
                 <thead><tr><th>Producto</th><th>Stock Actual</th><th>Precio</th><th>Acción</th></tr></thead>
@@ -245,7 +241,7 @@
         </div>
 
         <!-- SECCIÓN ANÁLISIS -->
-        <div id="tab-analisis" class="tab-content admin-only" style="display:none">
+       <div id="tab-analisis" class="tab-content" data-admin="true" style="display:none">
             <h3>Análisis de Ventas 📊</h3>
             <div class="stats-grid">
                 <div class="stat-card">
@@ -331,28 +327,43 @@
         let isAdmin = false;
 
         function login() {
-            const pass = document.getElementById('passInput').value;
-                if (pass === ADMIN_PASS) {
-                    isAdmin = true;
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('appContainer').style.display = 'block';
-                    document.getElementById('appContainer').classList.remove('public-view');
-                    document.getElementById('appContainer').classList.add('admin-visible'); // ← AGREGAR ESTA LÍNEA
-                    loadData();
-                } else {
-                    alert("Contraseña incorrecta 🥺");
-                }
-            }
+    const pass = document.getElementById('passInput').value;
+    if (pass === ADMIN_PASS) {
+        isAdmin = true;
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('appContainer').style.display = 'block';
+        document.getElementById('appContainer').classList.remove('public-view');
+        
+        // Mostrar elementos admin
+        document.getElementById('adminTabs').style.display = 'flex';
+        document.querySelectorAll('[data-admin="true"]').forEach(el => {
+            el.style.display = 'block';
+        });
+        
+        loadData();
+    } else {
+        alert("Contraseña incorrecta ");
+    }
+}
 
-       function showPublic() {
-            isAdmin = false;
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('appContainer').style.display = 'block';
-            document.getElementById('appContainer').classList.remove('admin-visible'); // ← AGREGAR ESTA LÍNEA
-            document.getElementById('appContainer').classList.add('public-view');
-            document.getElementById('cartFloat').style.display = 'block';
-            loadData();
-        }
+function showPublic() {
+    isAdmin = false;
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appContainer').style.display = 'block';
+    document.getElementById('appContainer').classList.add('public-view');
+    
+    // Ocultar elementos admin
+    document.getElementById('adminTabs').style.display = 'none';
+    document.querySelectorAll('[data-admin="true"]').forEach(el => {
+        el.style.display = 'none';
+    });
+    
+    // Mostrar solo catálogo
+    document.getElementById('tab-catalogo').style.display = 'block';
+    document.getElementById('cartFloat').style.display = 'block';
+    
+    loadData();
+}
 
         async function loadData() {
             document.getElementById('loadingSpinner').style.display = 'flex';
@@ -668,11 +679,22 @@
         }
 
         function showTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + tabName).style.display = 'block';
-            event.target.classList.add('active');
-        }
+    // Ocultar todas las secciones
+    document.querySelectorAll('.tab-content').forEach(t => {
+        t.style.display = 'none';
+    });
+    
+    // Quitar active de todos los botones
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active');
+    });
+    
+    // Mostrar la sección seleccionada
+    document.getElementById('tab-' + tabName).style.display = 'block';
+    
+    // Agregar active al botón clickeado
+    event.target.classList.add('active');
+}
 
         function openModal(id) { 
             if(id === 'clientModal') {
